@@ -12,10 +12,9 @@ require Exporter;
 @EXPORT = qw(
 	
 );
-$VERSION = '0.2.1';
+$VERSION = '0.3';
 
 my $debug=0;
-my $showdirs=0;
 
 =head1 NAME
 
@@ -32,7 +31,7 @@ File::List - Perl extension for crawling directory trees and compiling lists of 
 =head1 DESCRIPTION
 
 This module crawls the directory tree starting at the provided base directory
-and can return files (and directories if desired) matching a regular expression
+and can return files (and/or directories if desired) matching a regular expression
 
 =cut
 
@@ -109,21 +108,24 @@ sub find {
 		if ( ref ( $self->{dirlist}{ $key } ) ) {
 			$debug && print _trace(),"following directory".$self->{base}."/".$key."\n";
 			$self->{showdirs} && $self->{dirlist}{ $key }->show_empty_dirs();
+			$self->{onlydirs} && $self->{dirlist}{ $key }->show_only_dirs();
 			push @result, @{ $self->{dirlist}{ $key }->find($reg) };
 		}
 		# ah, found a file, push it into the results (if it matches the regexp)
 		else {
 			my $path = $self->{base}."/".$key;
 			$debug && print _trace(),"found file $path\n"; 
-			push @result, ($path) if ($path =~ eval{qr/$reg/} );
+			if ( ($path =~ eval{qr/$reg/}) && (! $self->{onlydirs}) ) {
+				push @result, ($path);
+			}
 			$file++;
 		}
 	}
 
 	
-	if (!$file && $self->{showdirs}) {
-		$debug && print _trace(),"found empty dir ".$self->{base}."\n";
-		push @result, ($self->{base}) if ($self->{base} =~ eval {qr/$reg/} );
+	if ( ( !$file && $self->{showdirs} || ( $self->{onlydirs} ) ) ){
+		$debug && print _trace(),"processing dir ".$self->{base}."\n";
+		push @result, ($self->{base}.'/') if ($self->{base} =~ eval {qr/$reg/} );
 	}
 
 	# we must be at the bottom level
@@ -154,6 +156,18 @@ Toggle display of empty directories
 sub show_empty_dirs {
 	my $self = shift;
 	$self->{showdirs} = $self->{showdirs}?undef:1;
+	return 1;
+}
+
+=head2 show_only_dirs();
+
+Toggle display of just directories
+
+=cut
+
+sub show_only_dirs {
+	my $self = shift;
+	$self->{onlydirs} = $self->{onlydirs}?undef:1;
 	return 1;
 }
 

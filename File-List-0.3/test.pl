@@ -18,14 +18,12 @@ print "ok 1\n";
 # (correspondingly "not ok 13") depending on the success of chunk 13
 # of the test code):
 
-my $test = new File::List("/usr/opt");
+my $test = new File::List("/usr/local/");
 
-#$test->show_empty_dirs();
-my @perl_scripts = @{ $test->find("music") };
+$test->show_empty_dirs();
+#$test->debug(1);
+#$test->show_only_dirs();
+my @perl_scripts = @{ $test->find("test") };
 print join("\n",@perl_scripts);
 print "\n-----------------\n";
 
-$test->show_empty_dirs();
-my @perl_scripts = @{ $test->find("music") };
-print join("\n",@perl_scripts);
-print "\n-----------------\n"; 
