@@ -40,10 +40,6 @@ INTERFACE
 
     Toggle display of empty directories
 
-  show_only_dirs();
-
-    Allows user to only display directories, no files
-
 AUTHOR
     Dennis Opacki, dopacki@internap.com
 
