@@ -6,12 +6,13 @@ SYNOPSIS
       use File::List;
 
       my $search = new File::List("/usr/local");
+      $search->show_empty_dirs();                   # toggle include empty directories in output
       my @files  = @{ $search->find("\.pl\$") };    # find all perl scripts in /usr/local
 
 DESCRIPTION
     This module crawls the directory tree starting at the provided
-    base directory and can return files matching a regular
-    expression
+    base directory and can return files (and directories if desired)
+    matching a regular expression
 
 INTERFACE
     The following methods are available in this module.
@@ -34,6 +35,10 @@ INTERFACE
   debug($level);
 
     This sets the debug level for find
+
+  show_empty_dirs();
+
+    Toggle display of empty directories
 
 AUTHOR
     Dennis Opacki, dopacki@internap.com

@@ -12,9 +12,10 @@ require Exporter;
 @EXPORT = qw(
 	
 );
-$VERSION = '0.1';
+$VERSION = '0.2';
 
 my $debug=0;
+my $showdirs=0;
 
 =head1 NAME
 
@@ -25,12 +26,13 @@ File::List - Perl extension for crawling directory trees and compiling lists of 
   use File::List;
 
   my $search = new File::List("/usr/local");
+  $search->show_empty_dirs();			# toggle include empty directories in output
   my @files  = @{ $search->find("\.pl\$") };	# find all perl scripts in /usr/local
 
 =head1 DESCRIPTION
 
 This module crawls the directory tree starting at the provided base directory
-and can return files matching a regular expression
+and can return files (and directories if desired) matching a regular expression
 
 =cut
 
@@ -76,7 +78,7 @@ sub new {
                 }
 
 		# if entry is a file, store it's name in the dirlist hash
-                elsif ( -f "$base/$entry") {
+                elsif ( -f "$base/$entry"){
 			$debug && print _trace(),"Found file : $base/$entry\n";
                         $self->{dirlist}{ $entry } = 1;
                 }
@@ -99,12 +101,14 @@ sub find {
 	my $self   = shift;
 	my $reg    = shift;
 	my @result = ();
+	my $file;
 
 	for my $key (keys %{ $self->{dirlist} } ) {
 
 		# if we found a reference to a File::List, ask for it's find()
 		if ( ref ( $self->{dirlist}{ $key } ) ) {
 			$debug && print _trace(),"following directory".$self->{base}."/".$key."\n";
+			$self->{showdirs} && $self->{dirlist}{ $key }->show_empty_dirs();
 			push @result, @{ $self->{dirlist}{ $key }->find($reg) };
 		}
 		# ah, found a file, push it into the results (if it matches the regexp)
@@ -112,8 +116,16 @@ sub find {
 			my $path = $self->{base}."/".$key;
 			$debug && print _trace(),"found file $path\n"; 
 			push @result, ($path) if ($path =~ eval{qr/$reg/} );
+			$file++;
 		}
 	}
+
+	
+	if (!$file && $self->{showdirs}) {
+		$debug && print _trace(),"found empty dir ".$self->{base}."\n";
+		push @result, ($self->{base}) if ($self->{base} =~ eval {qr/$reg/} );
+	}
+
 	# we must be at the bottom level
 	return \@result;
 }
@@ -133,6 +145,17 @@ sub debug {
         return 1;
 }
 
+=head2 show_empty_dirs();
+
+Toggle display of empty directories
+
+=cut
+
+sub show_empty_dirs {
+	my $self = shift;
+	$self->{showdirs} = $self->{showdirs}?undef:1;
+	return 1;
+}
 
 #################
 # Private methods, not to be used in the public API
