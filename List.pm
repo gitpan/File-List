@@ -12,7 +12,7 @@ require Exporter;
 @EXPORT = qw(
 	
 );
-$VERSION = '0.2';
+$VERSION = '0.2.1';
 
 my $debug=0;
 my $showdirs=0;
