@@ -1,0 +1,43 @@
+NAME
+    File::List - Perl extension for crawling directory trees and
+    compiling lists of files
+
+SYNOPSIS
+      use File::List;
+
+      my $search = new File::List("/usr/local");
+      my @files  = @{ $search->find("\.pl\$") };    # find all perl scripts in /usr/local
+
+DESCRIPTION
+    This module crawls the directory tree starting at the provided
+    base directory and can return files matching a regular
+    expression
+
+INTERFACE
+    The following methods are available in this module.
+
+  new($base);
+
+    This creates a new File::List object and starts crawling the
+    tree from this base
+
+    It takes a scalar base directory as an argument and returns an
+    object reference
+
+  find($regexp);
+
+    This method accepts a scalar regular expression to search for.
+
+    It returns a reference to an array containing the full path to
+    files matching the expression (under this base).
+
+  debug($level);
+
+    This sets the debug level for find
+
+AUTHOR
+    Dennis Opacki, dopacki@internap.com
+
+SEE ALSO
+    perl(1).
+
